@@ -85,8 +85,13 @@ class Scraper:
             infoBox = [i.find(class_="col-xs-12 col-sm-6 col-md-9") for i in outBox]
             downloadBox = [i.find(class_="col-xs-12 col-sm-6 col-md-3") for i in outBox]
             episodeNumber.extend( [i.find(itemprop='episodeNumber').string for i in infoBox] )
-            episodeMagnet.extend( [i.find(lambda tag:tag.name=="a" and self.quality in tag.text).get('href') for i in downloadBox])
-        
+            try:
+                episodeMagnet.extend( [i.find(lambda tag:tag.name=="a" and self.quality in tag.text).get('href') for i in downloadBox])
+            except: # If format doesn't exist
+                if self.quality.find("480") != -1:
+                    episodeMagnet.extend( [i.find(lambda tag:tag.name=="a" and "720p" in tag.text).get('href') for i in downloadBox])
+                elif self.quality.find("720") != -1:
+                    episodeMagnet.extend( [i.find(lambda tag:tag.name=="a" and "480p" in tag.text).get('href') for i in downloadBox])
         return list(zip(*[ seasonNumber, episodeNumber, episodeMagnet ]))
 
     def dataBaseUpdate(self, episodes):
