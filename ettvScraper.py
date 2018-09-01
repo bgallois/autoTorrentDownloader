@@ -5,6 +5,7 @@ import sqlite3
 import libtorrent as lt
 import time
 import os
+import string
 
 
 class Scraper:
@@ -27,6 +28,7 @@ class Scraper:
         self.dir = os.path.dirname('series/' + self.name + '/')
         if not os.path.exists(self.dir):
                 os.makedirs(self.dir)
+        
 
         # Create the database where previouly download episodes will be stored
         self.db = sqlite3.connect('dataBase.db')
@@ -55,14 +57,8 @@ class Scraper:
         searchResults = soup.find_all(class_ = 'link-image')
 
         s = [i.get('href') for i in searchResults]
-        if len(s) > 1: # Severale series find
-            print("Not specific enought")
-            return None
-        elif len(s) == 0: # Not serie found
-            print("Can't find the serie")
-            return None
-        else:
-            return s[0]
+
+        return s[0]
 
     def getEpisodes(self, homePage):
         '''
@@ -109,7 +105,7 @@ class Scraper:
 
             if not data: # Not existing in the database
                     print('S' + episode[0] + 'E' + episode[1] + ' will be Downloaded')
-                    self.download(episode[2])
+                    #self.download(episode[2])
                     query = 'INSERT INTO {} VALUES(?, ?)'.format(self.name)
                     self.c.execute(query, (int(episode[0]), int(episode[1])))
                     self.db.commit()
@@ -133,5 +129,4 @@ class Scraper:
         while (handle.status().state != lt.torrent_status.seeding):
             print('%d %% done' % (handle.status().progress*100))
             time.sleep(1)
-
 
