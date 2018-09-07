@@ -104,8 +104,8 @@ class Scraper:
             data = self.c.fetchall()
 
             if not data: # Not existing in the database
-                    print('S' + episode[0] + 'E' + episode[1] + ' will be Downloaded')
-                    #self.download(episode[2])
+                    print('S' + episode[0] + 'E' + episode[1] + ' of ' + self.name + ' will be Downloaded')
+                    self.download(episode[2])
                     query = 'INSERT INTO {} VALUES(?, ?)'.format(self.name)
                     self.c.execute(query, (int(episode[0]), int(episode[1])))
                     self.db.commit()

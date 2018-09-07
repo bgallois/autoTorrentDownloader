@@ -19,6 +19,7 @@ def checkSearch(query):
 		return [j.find('img', alt=True)['alt'] for i, j in enumerate(searchResults)][int(choice)], True
             
 	elif len(s) == 0: # Not serie found
+		print(query + "not found")
 		choice = input("New keywords: ")
 		return choice, False
 	else:
@@ -50,7 +51,7 @@ def main():
 	lines = readConf()
 	for line in lines:
 		serie = line.split('\t')
-#		Scraper(serie[0], serie[1])
+		Scraper(serie[0], serie[1])
 
 
 main()
