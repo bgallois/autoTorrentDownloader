@@ -11,10 +11,11 @@ import string
 class Scraper:
     ''' Simple class to scrape serie from ettv torrent, compare them to previously downloaded episodes and download the new episodes'''
 
-    def __init__(self, query, quality):
+    def __init__(self, query, quality, number):
         '''
         :param query: keywords for the serie to download
         :param quality: keywords to specified the quality, either 480p or 720p
+        :param number: keywords to specified the number of episodes from the last episode to download, 0 mean all the serie
         :type query: str
         :type quality: str
         '''
@@ -23,6 +24,7 @@ class Scraper:
         self.query = query.replace(' ', '+')
         self.quality = quality
         self.name = query.replace(' ', '')
+        self.number = number
 
         # Create a directory to stock the file 
         self.dir = os.path.dirname('series/' + self.name + '/')
@@ -39,6 +41,7 @@ class Scraper:
         # Scape, compare with database and download
         homePage = self.searchSerie()
         episodes = self.getEpisodes(homePage)
+        self.lastEpisode(episodes)
         self.dataBaseUpdate(episodes)
         self.c.close()
         self.db.close()
@@ -90,6 +93,22 @@ class Scraper:
                     episodeMagnet.extend( [i.find(lambda tag:tag.name=="a" and "480p" in tag.text).get('href') for i in downloadBox])
         return list(zip(*[ seasonNumber, episodeNumber, episodeMagnet ]))
 
+    def lastEpisode(self, episodes):
+        '''
+        :description: find the last season and the last episode of a tv show
+        :param episodes: list of episodes available and its magnet links
+        :type episodes: list of tuples
+        '''
+
+        self.lastSeason = 0
+        self.lastEpisode = 0
+        for season, __, __ in episodes:
+            if self.lastSeason < int(season):
+                self.lastSeason = int(season)
+        for __, episode, __ in episodes:
+            if self.lastEpisode < int(episode.string):
+                self.lastEpisode = int(episode)
+	
     def dataBaseUpdate(self, episodes):
         '''
         :description: compare the list of episodes find on ettv the database of previously downloaded episodes. Then downloaded new episodes and update the database
@@ -104,8 +123,13 @@ class Scraper:
             data = self.c.fetchall()
 
             if not data: # Not existing in the database
-                    print('S' + episode[0] + 'E' + episode[1] + ' of ' + self.name + ' will be Downloaded')
-                    self.download(episode[2])
+                    if self.number == 0: # Download all the serie
+                        print('S' + episode[0] + 'E' + episode[1] + ' of ' + self.name + ' will be Downloaded')
+                        self.download(episode[2])
+                    elif self.number != 0: # Download the last number of episodes
+                        if int(episode[0]) == self.lastSeason and int(episode[1]) in range(self.lastEpisode - int(self.number), self.lastEpisode):
+                            print('S' + episode[0] + 'E' + episode[1] + ' of ' + self.name + ' will be Downloaded')
+                            self.download(episode[2])
                     query = 'INSERT INTO {} VALUES(?, ?)'.format(self.name)
                     self.c.execute(query, (int(episode[0]), int(episode[1])))
                     self.db.commit()

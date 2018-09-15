@@ -42,7 +42,7 @@ def checkConf():
 		while not b: 
 			a, b = checkSearch(a)
 			print(line)
-		newConf.append(a + '\t' + serie[1] + '\n')
+		newConf.append(a + '\t' + serie[1] + '\t' + serie[2] + '\n')
 	with open("series.txt", 'w') as f:
 		f.writelines(newConf)
 
@@ -51,7 +51,7 @@ def main():
 	lines = readConf()
 	for line in lines:
 		serie = line.split('\t')
-		Scraper(serie[0], serie[1])
+		Scraper(serie[0], serie[1], serie[2])
 
 
 main()
