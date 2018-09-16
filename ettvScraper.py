@@ -140,10 +140,10 @@ class Scraper:
             data = self.c.fetchall()
 
             if not data: # Not existing in the database
-                    if self.number == 0: # Download all the serie
+                    if int(self.number) == 0: # Download all the serie
                         print('S' + episode[0] + 'E' + episode[1] + ' of ' + self.name + ' will be Downloaded')
                         self.download(episode[2])
-                    elif self.number != 0: # Download the last number of episodes
+                    elif int(self.number) != 0: # Download the last number of episodes
                         if int(episode[0]) == self.lastSeason and int(episode[1]) in range(self.lastEpisode - int(self.number), self.lastEpisode):
                             print('S' + episode[0] + 'E' + episode[1] + ' of ' + self.name + ' will be Downloaded')
                             self.download(episode[2])
