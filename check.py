@@ -23,7 +23,8 @@ def checkSearch(query):
 		choice = input("New keywords: ")
 		return choice, False
 	else:
-		return query.replace('+', ' '), True
+		return [j.find('img', alt=True)['alt'] for i, j in enumerate(searchResults)][0], True
+
 
 def readConf():
         
