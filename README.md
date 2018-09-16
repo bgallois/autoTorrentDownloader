@@ -8,7 +8,9 @@ It works on Linux by command lines: you can use it on a VPS.
 1. Download the dist folder in the git archive.
 2. Inside the folder dist/autoTorrentDownloader creates the file "series.txt" (an example file already exist).
 3. In the file "series.txt" add the series that you want to follow following this convention:  
-name of the serie one tabulation the format (720p or 480p) one tabulation number of episodes to download.  Arrow	720p	1
+name of the serie one tabulation the format (720p or 480p) one tabulation number of episodes to download.
+
+Arrow	720p	1
  
 * name of the serie: keyword for the name of the serie, if multiple series found the program will ask you to choose the right serie.  
 * format: 720p or 480p, if the one you choose is not available it will download the other.
