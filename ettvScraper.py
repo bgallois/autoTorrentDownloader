@@ -42,6 +42,7 @@ class Scraper:
         self.quality = quality
         self.name = query.replace(' ', '')
         self.number = number
+        self.status = True
 
         # Create a directory to stock the file 
         self.dir = os.path.dirname('series/' + self.name + '/')
@@ -133,7 +134,6 @@ class Scraper:
         :type episodes: list of tuples
 
         '''
-
         for episode in episodes:
             query = 'SELECT * FROM {} WHERE saison = ? AND episode = ?'.format(self.name)
             self.c.execute(query, (episode[0], episode[1]))
@@ -144,12 +144,15 @@ class Scraper:
                         print('S' + episode[0] + 'E' + episode[1] + ' of ' + self.name + ' will be Downloaded')
                         self.download(episode[2])
                     elif int(self.number) != 0: # Download the last number of episodes
-                        if int(episode[0]) == self.lastSeason and int(episode[1]) in range(self.lastEpisode - int(self.number), self.lastEpisode):
+                        if int(episode[0]) == self.lastSeason and int(episode[1]) in range(self.lastEpisode - int(self.number) + 1, self.lastEpisode + 1):
                             print('S' + episode[0] + 'E' + episode[1] + ' of ' + self.name + ' will be Downloaded')
                             self.download(episode[2])
-                    query = 'INSERT INTO {} VALUES(?, ?)'.format(self.name)
-                    self.c.execute(query, (int(episode[0]), int(episode[1])))
-                    self.db.commit()
+                    if self.status:
+                        query = 'INSERT INTO {} VALUES(?, ?)'.format(self.name)
+                        self.c.execute(query, (int(episode[0]), int(episode[1])))
+                        self.db.commit()
+                    elif not self.status:
+                            print('S' + episode[0] + 'E' + episode[1] + ' of ' + self.name + ' download has failed')
     
     def download(self, link):
         '''
@@ -165,9 +168,15 @@ class Scraper:
         handle = lt.add_magnet_uri(ses, link, params)
         print(link)
         print('downloading metadata...')
-        while (not handle.has_metadata()): time.sleep(1)
+        start = time.time()
+        self.status = True
+        while (not handle.has_metadata()):
+            time.sleep(1)
+            if (time.time() - start > 20):
+                self.status = False
+                break
         print('got metadata, starting torrent download...')
-        while (handle.status().state != lt.torrent_status.seeding):
+        while (handle.status().state != lt.torrent_status.seeding) and (self.status == True):
             print('%d %% done' % (handle.status().progress*100))
             time.sleep(1)
 
