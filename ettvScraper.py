@@ -41,6 +41,7 @@ class Scraper:
         self.query = query.replace(' ', '+')
         self.quality = quality
         self.name = query.replace(' ', '')
+        self.name = self.name.replace(':', '')
         self.number = number
         self.status = True
 
