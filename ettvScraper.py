@@ -124,8 +124,8 @@ class Scraper:
         for season, __, __ in episodes:
             if self.lastSeason < int(season):
                 self.lastSeason = int(season)
-        for __, episode, __ in episodes:
-            if self.lastEpisode < int(episode.string):
+        for season, episode, __ in episodes:
+            if self.lastSeason == int(season) and self.lastEpisode < int(episode.string):
                 self.lastEpisode = int(episode)
 	
     def dataBaseUpdate(self, episodes):
