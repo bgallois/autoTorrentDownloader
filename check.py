@@ -19,6 +19,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 from ettvScraper import Scraper
 import requests
 from bs4 import BeautifulSoup
+import os
+import sys
+
+# Set path
+if sys.argv[0]:
+  os.chdir(os.path.dirname(sys.argv[0]))
 
 
 
